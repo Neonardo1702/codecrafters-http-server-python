@@ -9,7 +9,7 @@ def respond(input: str) -> tuple:
     out_header = {}
     body = "bwah"
     
-    endpoint = input.split(" ")[1].split("/")
+    endpoint = target.split(" ")[1].split("/")
     func = endpoint[1]
     if func == "":
         stat = "200 OK"
@@ -20,11 +20,11 @@ def respond(input: str) -> tuple:
         out_header["Content-Length"]=len(body)
     if func == "user-agent" and "User-Agent" in headers:
         stat = "200 OK"
-        body = headers["User-Agent"]
+        body = headers["User-Agent"].strip()
         out_header["Content-Type"]="text/plain"
         out_header["Content-Length"]=len(body)
         
-    return stat,header,body
+    return stat,out_header,body
     
 
 def main():
