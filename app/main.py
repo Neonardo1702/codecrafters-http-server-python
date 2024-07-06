@@ -1,6 +1,25 @@
 # Uncomment this to pass the first stage
 import socket
 
+def respond(input: str) -> tuple:
+    decoded = data.split("\r\n")
+    target, header, body = decoded[0], decoded[1:-2], decoded[-1]
+    
+    stat = "200 OK"
+    header = {}
+    body = "bwah"
+    
+    endpoint = input.split(" ")[1].split("/")
+    func = endpoint[1]
+    if function = "":
+        return stat,header,body
+    if func = echo:
+        body = endpoint[2]
+        header["Content-Type"]="text/plain"
+        header["Content-Length"]=len(body)
+    
+    return stat,header,body
+    
 
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -12,15 +31,11 @@ def main():
     client, addr = server_socket.accept()
     print(addr)
     data = client.recv(2048).decode()
-    decoded = data.split("\r\n")
-    target, header, body = decoded[0], decoded[1:-2], decoded[-1] 
-    response_status = "200 OK"
-    response_body = f"your address is {addr}"
-    if target.split(" ")[1] != "/":
-        response_status = "404 Not Found"
+    response_status,response_header, response_body = respond(input = data)
 
+    out_header = f"{key}: {value}\r\n" for key, value in response_header.items()
 
-    response = f"HTTP/1.1 {response_status}\r\n\r\n{response_body}"
+    response = f"HTTP/1.1 {response_status}\r\n{out_header}\r\n{response_body}"
     client.send(response.encode())
 
 if __name__ == "__main__":
