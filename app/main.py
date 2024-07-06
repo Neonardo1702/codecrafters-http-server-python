@@ -34,16 +34,18 @@ def main():
     # Uncomment this to pass the first stage
     #
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
-    client, addr = server_socket.accept()
-    print(addr)
-    data = client.recv(2048).decode()
-    response_status,response_header, response_body = respond(input = data)
-
-    out_headers = [f"{key}: {value}" for key, value in response_header.items()]
-    out_header = "\r\n".join(out_headers)
-
-    response = f"HTTP/1.1 {response_status}\r\n{out_header}\r\n\r\n{response_body}"
-    client.send(response.encode())
+    while True:
+        client, addr = server_socket.accept()
+        print(addr)
+        data = client.recv(2048).decode()
+        response_status,response_header, response_body = respond(input = data)
+        out_headers = [f"{key}: {value}" for key, value in response_header.items()]
+        out_header = "\r\n".join(out_headers)
+        
+        response = f"HTTP/1.1 {response_status}\r\n{out_header}\r\n\r\n{response_body}"
+        client.send(response.encode())
+        if response_status == "TERMINATE":
+            break
 
 if __name__ == "__main__":
     main()
