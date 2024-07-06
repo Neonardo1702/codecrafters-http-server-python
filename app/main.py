@@ -4,9 +4,9 @@ import socket
 def respond(input: str) -> tuple:
     decoded = input.split("\r\n")
     target, header, body = decoded[0], decoded[1:-2], decoded[-1]
-    
+    headers = {header_item.split(":")[0]:"".join(header_item.split(":")[1:]) for header_item in header}
     stat = "404 Not Found"
-    header = {}
+    out_header = {}
     body = "bwah"
     
     endpoint = input.split(" ")[1].split("/")
@@ -16,9 +16,14 @@ def respond(input: str) -> tuple:
     if func == "echo":
         stat = "200 OK"
         body = endpoint[2]
-        header["Content-Type"]="text/plain"
-        header["Content-Length"]=len(body)
-    
+        out_header["Content-Type"]="text/plain"
+        out_header["Content-Length"]=len(body)
+    if func == "user-agent" and "User-Agent" in headers:
+        stat = "200 OK"
+        body = headers["User-Agent"]
+        out_header["Content-Type"]="text/plain"
+        out_header["Content-Length"]=len(body)
+        
     return stat,header,body
     
 
