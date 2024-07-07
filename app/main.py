@@ -5,14 +5,16 @@ import socket
 
 def compression(header,body,com_type) -> tuple:
     # Compression Handling
+    coms = [com.strip() for com in com_type.split(",")]
     supported_encodings = ["gzip"]
 
     out_header = header.copy()
     out_body = body
-    
-    if com_type in supported_encodings:
-        out_header["Content-Encoding"] = com_type
-        # gzip out body
+    for com in coms:
+        if com in supported_encodings:
+            out_header["Content-Encoding"] = com_type
+            # gzip out body
+            break
 
     return out_header, out_body
 
