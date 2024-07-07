@@ -9,33 +9,40 @@ def respond(input: str) -> tuple:
     headers = {header_item.split(":")[0]:"".join(header_item.split(":")[1:]) for header_item in header}
     stat = "404 Not Found"
     out_header = {}
-    body = "bwah"
+    out_body = "bwah"
     
+    method = target.split(" ")[0]
     endpoint = target.split(" ")[1].split("/")
     func = endpoint[1]
     if func == "":
         stat = "200 OK"
     if func == "echo":
         stat = "200 OK"
-        body = endpoint[2]
+        out_body = endpoint[2]
         out_header["Content-Type"]="text/plain"
-        out_header["Content-Length"]=len(body)
     if func == "user-agent" and "User-Agent" in headers:
         stat = "200 OK"
-        body = headers["User-Agent"].strip()
+        out_body = headers["User-Agent"].strip()
         out_header["Content-Type"]="text/plain"
-        out_header["Content-Length"]=len(body)
     if func == "files":
         filepath = os.path.join(DIR,*endpoint[2:])
         print(filepath)
-        if os.path.exists(filepath):
+        if method == "GET" and os.path.exists(filepath):
             stat = "200 OK"
             with open(filepath,"r",encoding="UTF-8") as f:
-                body = f.read()
+                out_body = f.read()
             out_header["Content-Type"]="application/octet-stream"
-            out_header["Content-Length"]=len(body)
 
-    return stat,out_header,body
+        if method == "POST":
+            stat = "201 Created"
+            with open(filepath,"w",encoding="UTF-8") as f:
+                f.write(body)
+            out_body = body
+            out_header["Content-Type"]="text/plain"
+    
+
+    out_header["Content-Length"]=len(out_body)
+    return stat,out_header,out_body
     
 
 def main():
