@@ -1,4 +1,6 @@
 # Uncomment this to pass the first stage
+import os
+import argparse
 import socket
 
 def respond(input: str) -> tuple:
@@ -23,7 +25,16 @@ def respond(input: str) -> tuple:
         body = headers["User-Agent"].strip()
         out_header["Content-Type"]="text/plain"
         out_header["Content-Length"]=len(body)
-        
+    if func == "files":
+        filepath = os.path.join(DIR,*endpoint[2:])
+        print(filepath)
+        if os.path.exists(filepath):
+            stat = "200 OK"
+            with open(filepath,"r",encoding="UTF-8") as f:
+                body = f.read()
+            out_header["Content-Type"]="application/octet-stream"
+            out_header["Content-Length"]=len(body)
+
     return stat,out_header,body
     
 
@@ -48,4 +59,14 @@ def main():
             break
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+            "--directory",
+            type=str,
+            required = False,
+            default = ".",
+            dest="directory"
+    )
+    args = parser.parse_args()
+    DIR = args.directory
     main()
