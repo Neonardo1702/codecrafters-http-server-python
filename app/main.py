@@ -12,7 +12,7 @@ def compression(header,body,com_type) -> tuple:
     out_body = body
     for com in coms:
         if com in supported_encodings:
-            out_header["Content-Encoding"] = com_type
+            out_header["Content-Encoding"] = com
             # gzip out body
             break
 
