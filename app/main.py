@@ -3,10 +3,25 @@ import os
 import argparse
 import socket
 
+def compression(header,body,com_type) -> tuple:
+    # Compression Handling
+    supported_encodings = ["gzip"]
+
+    out_header = header.copy()
+    out_body = body
+    
+    if com_type in supported_encodings:
+        out_header["Content-Encoding"] = com_type
+        # gzip out body
+
+    return out_header, out_body
+
+
+
 def respond(input: str) -> tuple:
     decoded = input.split("\r\n")
     target, header, body = decoded[0], decoded[1:-2], decoded[-1]
-    headers = {header_item.split(":")[0]:"".join(header_item.split(":")[1:]) for header_item in header}
+    headers = {header_item.split(":")[0]:str("".join(header_item.split(":")[1:])).strip() for header_item in header}
     stat = "404 Not Found"
     out_header = {}
     out_body = "bwah"
@@ -40,6 +55,10 @@ def respond(input: str) -> tuple:
             out_body = body
             out_header["Content-Type"]="text/plain"
     
+    #handling compression
+
+    if "Accept-Encoding" in headers:
+        out_header, out_body = compression(header=out_header,body=out_body,com_type=headers["Accept-Encoding"])
 
     out_header["Content-Length"]=len(out_body)
     return stat,out_header,out_body
