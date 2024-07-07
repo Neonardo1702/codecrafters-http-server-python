@@ -1,6 +1,7 @@
 # Uncomment this to pass the first stage
 import os
 import argparse
+import gzip
 import socket
 
 def compression(header,body,com_type) -> tuple:
@@ -14,6 +15,7 @@ def compression(header,body,com_type) -> tuple:
         if com in supported_encodings:
             out_header["Content-Encoding"] = com
             # gzip out body
+            out_body = gzip.compress(body.encode())
             break
 
     return out_header, out_body
@@ -81,8 +83,11 @@ def main():
         out_headers = [f"{key}: {value}" for key, value in response_header.items()]
         out_header = "\r\n".join(out_headers)
         
-        response = f"HTTP/1.1 {response_status}\r\n{out_header}\r\n\r\n{response_body}"
-        client.send(response.encode())
+        response = f"HTTP/1.1 {response_status}\r\n{out_header}\r\n\r\n{response_body}".encode()
+        if isinstance(response_body, bytes):
+            response = f"HTTP/1.1 {response_status}\r\n{out_header}\r\n\r\n".encode()+response_body
+
+        client.send(response)
         if response_status == "TERMINATE":
             break
 
